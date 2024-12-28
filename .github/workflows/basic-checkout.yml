@@ -1,33 +1,52 @@
-name: Basic Checkout Lab
-
-# Trigger workflow on push to the main branch
+name: Multiple Jobs Lab
 on:
   push:
     branches:
       - main
 
 jobs:
-  basic-checkout:
+  # First job: Build
+  build:
+    name: Build Application
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Checkout the repository
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: List repository contents
-      - name: List files
-        run: ls -la
-
-      # Step 3: Display system information
-      - name: Show system info
+      - name: Build step
         run: |
-          echo "Repository: $GITHUB_REPOSITORY"
-          echo "Operating System: $(uname -a)"
-          echo "Current Directory: $(pwd)"
+          echo "🏗️ Building the application..."
+          echo "Build completed successfully!"
 
-      # Step 4: Check software versions
-      - name: Check versions
+  # Second job: Test
+  test:
+    name: Run Tests
+    needs: build # Depends on build job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run tests
         run: |
-          echo "Node version: $(node --version)"
-          echo "Python version: $(python --version)"
-          echo "Git version: $(git --version)"
+          echo "🧪 Running tests..."
+          echo "All tests passed!"
+
+  # Third job: Deploy
+  deploy:
+    name: Deploy Application
+    needs: [build, test] # Depends on both build and test jobs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        run: |
+          echo "🚀 Deploying application..."
+          echo "Deployment successful!"
+
+  # Fourth job: Notify
+  notify:
+    name: Send Notification
+    needs: deploy # Depends on deploy job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send notification
+        run: |
+          echo "📧 Sending deployment notification..."
+          echo "Notification sent!"
